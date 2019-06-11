@@ -27,10 +27,13 @@
 access_log を1分ごとに集計し、core出力の前後3分間のアクセス状況を確認すると、coreを吐いた頃にピークがある観測が得られた（最多 1189 件）。
 
 * 1分ごとのアクセス数を集計
+
 ```
 for f in htc_web1_logs/access_log.*.zip; do unzip -p $f | awk '{ sub("^\\[","",$5); sub(":[0-9][0-9]$","",$5); print $5 }'; done | sort | uniq -c > access_log_aggregation.txt
 ```
+
 * [coreの日時](file:///material/core_0529-0602_ls-ltr.txt) で集計結果を grep
+
 ```
 for t in `cat core_0529-0602_ls-ltr.txt | perl -ne '$f = ""; while (<>) { @F = split(" "); $tmp = sprintf("%02d/%s/2019:%s\n",$F[6],$F[5],$F[7]); if ($f ne $tmp) { $f = $tmp ; } else { next; } print $f }'`; do grep `echo $t` access_log_aggregation.txt; done
     618 29/May/2019:21:21
@@ -43,6 +46,7 @@ for t in `cat core_0529-0602_ls-ltr.txt | perl -ne '$f = ""; while (<>) { @F = s
     880 02/Jun/2019:08:57
     799 02/Jun/2019:08:59
 ```
+
 * core出力の前後3分間のアクセス状況
   [accesses_around_coredump.txt](file:///material/accesses_around_coredump.txt)
 
@@ -65,6 +69,7 @@ coreを吐くとき error_log に Backtrace が出力されるケースがある
 * [access_log_backtrace_time.txt](file:///material/access_log_backtrace_time.txt)
 
 その時刻と一致する access_log により、会員を特定したところ、5会員にしぼれることがわかった。
+
 ```
 $ awk -F'People=' '$2 !~ /^$/ { sub(";.*","",$2); print $2 }' access_log_backtrace_time.txt | sort -u
 2d9efb83e770846c9e3018fa2992d26e
